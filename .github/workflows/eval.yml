@@ -1,0 +1,61 @@
+name: Eval on Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Model to evaluate"
+        default: "gpt-4o-mini"
+      n_cases:
+        description: "Number of synthetic test cases"
+        default: "30"
+
+jobs:
+  run-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run synthetic eval
+        run: |
+          eval-agent run \
+            --task examples/extraction/task.yaml \
+            --model ${{ github.event.inputs.model || 'gpt-4o-mini' }} \
+            --synthetic \
+            --n-cases ${{ github.event.inputs.n_cases || '30' }} \
+            --output eval-results
+        env:
+          PYTHONPATH: src
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Upload eval report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report-${{ github.run_id }}
+          path: eval-results/
+
+      - name: Post report to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const files = fs.readdirSync('eval-results').filter(f => f.endsWith('.md'));
+            if (files.length === 0) return;
+            const report = fs.readFileSync(`eval-results/${files[0]}`, 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Eval Report\n\n${report}`
+            });

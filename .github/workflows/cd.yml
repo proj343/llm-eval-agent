@@ -1,0 +1,75 @@
+name: CD — Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "Dockerfile"
+      - "pyproject.toml"
+
+permissions:
+  id-token: write  # OIDC for keyless auth
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Log in to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/llm-eval-agent:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/llm-eval-agent:$IMAGE_TAG $ECR_REGISTRY/llm-eval-agent:latest
+          docker push $ECR_REGISTRY/llm-eval-agent:$IMAGE_TAG
+          docker push $ECR_REGISTRY/llm-eval-agent:latest
+
+      - name: Update Lambda image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+        run: |
+          aws lambda update-function-code \
+            --function-name llm-eval-agent-prod \
+            --image-uri $ECR_REGISTRY/llm-eval-agent:$IMAGE_TAG \
+            --region us-east-1
+
+      - name: Wait for Lambda update
+        run: |
+          aws lambda wait function-updated \
+            --function-name llm-eval-agent-prod \
+            --region us-east-1
+
+      - name: Smoke test — invoke Lambda
+        run: |
+          aws lambda invoke \
+            --function-name llm-eval-agent-prod \
+            --payload '{"mode":"synthetic","n_cases":3,"model":"gpt-4o-mini"}' \
+            --cli-binary-format raw-in-base64-out \
+            --region us-east-1 \
+            /tmp/response.json
+          cat /tmp/response.json
+          python -c "
+          import json, sys
+          r = json.load(open('/tmp/response.json'))
+          body = json.loads(r.get('body', '{}'))
+          f1 = body.get('overall_f1', 0)
+          print(f'Smoke test F1: {f1}')
+          sys.exit(0 if f1 > 0 else 1)
+          "

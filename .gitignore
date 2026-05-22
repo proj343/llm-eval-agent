@@ -1,0 +1,17 @@
+.env
+*.pyc
+__pycache__/
+*.egg-info/
+.eggs/
+dist/
+build/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+results/*.md
+results/*.json
+tests/fixtures/
+*.mp3
+*.wav
+*.m4a
+.DS_Store

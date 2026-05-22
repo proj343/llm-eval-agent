@@ -1,0 +1,49 @@
+name: sales_call_extraction
+description: >
+  Extract structured decision signals from senior care sales advisor call transcripts.
+  These signals drive lead routing, urgency scoring, and advisor follow-up strategies.
+
+fields:
+  - name: urgency
+    type: enum
+    values: [high, medium, low]
+    description: How urgently the customer needs placement (high = within days/weeks, medium = 1-3 months, low = exploring/no timeline)
+    nullable: true
+
+  - name: budget_mentioned
+    type: bool
+    description: Whether a specific budget range or price concern was explicitly stated by the customer
+    nullable: false
+
+  - name: objection_type
+    type: enum
+    values: [price, timing, fit, none]
+    description: Primary objection raised by the customer (price = cost concern, timing = not ready yet, fit = unsure about type of care, none = no objection)
+    nullable: true
+
+  - name: sentiment
+    type: enum
+    values: [positive, neutral, negative]
+    description: Overall customer emotional tone throughout the call
+    nullable: false
+
+constraints:
+  - Return null for fields where there is insufficient evidence — do not infer or guess
+  - budget_mentioned must be false unless the customer explicitly stated a dollar amount or said something is too expensive
+  - urgency should reflect the customer's own stated or implied timeline, not the advisor's framing
+  - sentiment should reflect the customer's tone, not the advisor's
+
+examples:
+  - input: "CUSTOMER: Mom had a fall last week and the doctor says she can't live alone anymore. We need to find something by end of month."
+    expected:
+      urgency: high
+      budget_mentioned: false
+      objection_type: none
+      sentiment: neutral
+
+  - input: "CUSTOMER: We're just starting to look around. No rush really, maybe next year sometime. AGENT: What's your budget looking like? CUSTOMER: Oh we can't afford much, maybe $3000 a month."
+    expected:
+      urgency: low
+      budget_mentioned: true
+      objection_type: price
+      sentiment: neutral
