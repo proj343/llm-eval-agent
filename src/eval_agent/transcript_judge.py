@@ -5,14 +5,14 @@ import re
 
 from anthropic import Anthropic
 
+from .schemas import TaskSpec, Transcript, TranscriptEvalResult
+
+_client = Anthropic()
+
 
 def _parse_json(text: str) -> object:
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.MULTILINE)
     return json.loads(text)
-
-from .schemas import Transcript, TranscriptEvalResult, TaskSpec
-
-_client = Anthropic()
 
 
 def evaluate_transcript(transcript: Transcript, task_spec: TaskSpec) -> TranscriptEvalResult:

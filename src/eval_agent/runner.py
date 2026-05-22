@@ -4,7 +4,7 @@ import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from .schemas import TaskSpec, TestCase, ModelOutput
+from .schemas import ModelOutput, TaskSpec, TestCase
 
 # Lazily initialised on first use so secrets are loaded before client construction
 _anthropic_client = None

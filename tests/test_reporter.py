@@ -1,23 +1,22 @@
 """Unit tests for reporter metrics — no API calls required."""
 
+from eval_agent.reporter import (
+    _analyze_failures,
+    _compute_correlation,
+    _compute_field_metrics,
+    render_markdown_report,
+)
 from eval_agent.schemas import (
+    EvalReport,
     ExtractionEvalResult,
     FieldMetrics,
     FieldSpec,
+    SpeakerTurn,
     TaskSpec,
     TestCase,
     Transcript,
-    SpeakerTurn,
+    TranscriptEvalResult,
 )
-from eval_agent.reporter import (
-    _compute_field_metrics,
-    _compute_correlation,
-    _analyze_failures,
-    render_markdown_report,
-    generate_report,
-    _aggregate_transcript_quality,
-)
-from eval_agent.schemas import TranscriptEvalResult, EvalReport
 
 
 def _make_task() -> TaskSpec:
@@ -51,7 +50,9 @@ def _make_case(case_id: str, expected: dict) -> TestCase:
     )
 
 
-def _make_result(case_id: str, field_scores: dict, overall: float = 1.0, failures: list[str] | None = None) -> ExtractionEvalResult:
+def _make_result(
+    case_id: str, field_scores: dict, overall: float = 1.0, failures: list[str] | None = None
+) -> ExtractionEvalResult:
     return ExtractionEvalResult(
         test_case_id=case_id,
         model="gpt-4o-mini",
@@ -155,7 +156,8 @@ class TestCorrelation:
     def test_no_variance(self):
         t_evals = [self._make_transcript_eval(f"f{i}", 0.8) for i in range(5)]
         e_evals = [
-            ExtractionEvalResult(test_case_id=f"c{i}", model="m", field_scores={}, overall_score=0.8, judge_reasoning="")
+            ExtractionEvalResult(test_case_id=f"c{i}", model="m", field_scores={}, overall_score=0.8,
+                                 judge_reasoning="")
             for i in range(5)
         ]
         assert _compute_correlation(t_evals, e_evals) is None

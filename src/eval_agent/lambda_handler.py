@@ -88,8 +88,8 @@ def handler(event: dict, context: object) -> dict:
     from eval_agent.reporter import generate_report, render_markdown_report
     from eval_agent.runner import run_extraction
     from eval_agent.schemas import TaskSpec, TestCase
-    from eval_agent.transcript_judge import evaluate_transcript
     from eval_agent.transcriber import TranscriptionProvider, transcribe_directory
+    from eval_agent.transcript_judge import evaluate_transcript
 
     with open(task_path) as f:
         task_spec = TaskSpec(**yaml.safe_load(f))

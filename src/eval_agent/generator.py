@@ -7,7 +7,7 @@ from pathlib import Path
 
 from anthropic import Anthropic
 
-from .schemas import TaskSpec, TestCase, Transcript, SpeakerTurn
+from .schemas import SpeakerTurn, TaskSpec, TestCase, Transcript
 
 
 def _parse_json(text: str) -> object:
@@ -21,7 +21,10 @@ _TARGET_DIST = {"happy_path": 0.30, "edge_case": 0.30, "adversarial": 0.25, "bou
 _CATEGORY_INSTRUCTIONS = {
     "happy_path": "Clear, unambiguous conversations where all fields are easily extractable from explicit statements.",
     "edge_case": "Conversations where some fields require inference or are only partially mentioned.",
-    "adversarial": "Conversations designed to cause hallucination: budget mentioned in passing but not real, false urgency cues, contradictory sentiment, misleading objection signals.",
+    "adversarial": (
+        "Conversations designed to cause hallucination: budget mentioned in passing but not real, "
+        "false urgency cues, contradictory sentiment, misleading objection signals."
+    ),
     "boundary": "Very short calls (3-5 turns), abrupt endings, or calls with only one speaker contributing.",
 }
 

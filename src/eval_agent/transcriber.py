@@ -4,7 +4,7 @@ import os
 from enum import Enum
 from pathlib import Path
 
-from .schemas import Transcript, SpeakerTurn
+from .schemas import SpeakerTurn, Transcript
 
 
 class TranscriptionProvider(str, Enum):

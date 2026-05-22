@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from eval_agent.schemas import FieldSpec, SpeakerTurn, TaskSpec, Transcript, TestCase
+from eval_agent.schemas import FieldSpec, SpeakerTurn, TaskSpec, Transcript
 
 
 def test_transcript_full_text_required():

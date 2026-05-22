@@ -213,7 +213,8 @@ def render_markdown_report(report: EvalReport) -> str:
             "",
             "> Calls with lower transcript quality scores tend to show proportionally lower extraction F1."
             if r > 0.3 else
-            "> Calls with higher transcript quality scores paradoxically correlate with lower extraction F1 — investigate prompt sensitivity or scoring artifacts."
+            "> Calls with higher transcript quality scores paradoxically correlate with lower extraction F1"
+            " — investigate prompt sensitivity or scoring artifacts."
             if r < -0.3 else
             "> Low correlation — transcript quality is not the primary driver of extraction failures.",
             "",

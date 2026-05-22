@@ -11,9 +11,9 @@ from pathlib import Path
 
 import pytest
 
+from eval_agent.reporter import generate_report, render_markdown_report
 from eval_agent.schemas import (
     ExtractionEvalResult,
-    FieldMetrics,
     FieldSpec,
     SpeakerTurn,
     TaskSpec,
@@ -21,7 +21,6 @@ from eval_agent.schemas import (
     Transcript,
     TranscriptEvalResult,
 )
-from eval_agent.reporter import generate_report, render_markdown_report
 
 GOLDEN_DIR = Path(__file__).parent / "fixtures"
 GOLDEN_DIR.mkdir(exist_ok=True)

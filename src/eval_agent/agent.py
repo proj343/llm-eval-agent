@@ -16,8 +16,8 @@ from .generator import generate_audio_from_transcripts, generate_test_cases
 from .reporter import generate_report, render_markdown_report
 from .runner import run_extraction
 from .schemas import TaskSpec, TestCase
-from .transcript_judge import evaluate_transcript
 from .transcriber import TranscriptionProvider, transcribe_directory
+from .transcript_judge import evaluate_transcript
 
 load_dotenv()
 

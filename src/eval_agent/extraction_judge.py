@@ -2,18 +2,17 @@ from __future__ import annotations
 
 import json
 import re
-from functools import lru_cache
 
 from anthropic import Anthropic
+
+from .schemas import ExtractionEvalResult, ModelOutput, TaskSpec, TestCase
+
+_client = Anthropic()
 
 
 def _parse_json(text: str) -> object:
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.MULTILINE)
     return json.loads(text)
-
-from .schemas import TaskSpec, TestCase, ModelOutput, ExtractionEvalResult
-
-_client = Anthropic()
 
 
 def generate_rubric(task_spec: TaskSpec) -> dict:

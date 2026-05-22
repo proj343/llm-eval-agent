@@ -1,7 +1,7 @@
 """Unit tests for transcript judge — offline computations only."""
 
 from eval_agent.schemas import SpeakerTurn, Transcript
-from eval_agent.transcript_judge import _compute_speaker_accuracy, _composite_score
+from eval_agent.transcript_judge import _composite_score, _compute_speaker_accuracy
 
 
 def _make_transcript(turns: list[tuple[str, str]], ground_truth: str | None = None) -> Transcript:
