@@ -156,26 +156,40 @@ See [`examples/extraction/task.yaml`](examples/extraction/task.yaml) for a full 
 
 ---
 
-## Example report output
+## Sample output
+
+### Synthetic eval — single model
 
 ```
+$ make eval-synthetic MODEL=gpt-4o-mini N_CASES=30
+```
+
+```
+⠴ Generated 30 synthetic test cases ✓
+⠦ Transcript quality evaluated ✓
+⠧ Rubric generated ✓
+⠇ Extraction evaluated (gpt-4o-mini) ✓
+```
+
+---
+
 # Eval Report — sales_call_extraction
 **Model:** `gpt-4o-mini`  |  **Transcripts evaluated:** 30
 
 ## Layer 1: Transcript Quality
 
-| Metric            | Score  |
-|-------------------|--------|
-| WER               | 4.2%   |
-| Speaker accuracy  | 91.3%  |
-| Coherence         | 0.87   |
-| Completeness      | 0.93   |
-| Overall quality   | **0.91** |
+| Metric           | Score      |
+|------------------|------------|
+| WER              | 4.2%       |
+| Speaker accuracy | 91.3%      |
+| Coherence        | 0.87       |
+| Completeness     | 0.93       |
+| Overall quality  | **0.91**   |
 
 ## Layer 2: Extraction Quality
 
-| Field            | Precision | Recall | F1      |
-|------------------|-----------|--------|---------|
+| Field            | Precision | Recall | F1        |
+|------------------|-----------|--------|-----------|
 | urgency          | 0.880     | 0.820  | **0.849** |
 | budget_mentioned | 0.940     | 0.910  | **0.925** |
 | objection_type   | 0.710     | 0.680  | **0.695** |
@@ -193,6 +207,49 @@ See [`examples/extraction/task.yaml`](examples/extraction/task.yaml) for a full 
 Pearson r = **0.612**
 
 > Calls with lower transcript quality scores tend to show proportionally lower extraction F1.
+
+---
+
+### Model comparison
+
+```
+$ make eval-compare MODEL=gpt-4o-mini COMPARE=gpt-4.1 N_CASES=50
+```
+
+```
+⠴ Generated 50 synthetic test cases ✓
+⠦ Transcript quality evaluated ✓
+⠧ Rubric generated ✓
+⠇ Extraction evaluated (gpt-4o-mini) ✓
+⠏ Extraction evaluated (gpt-4.1) ✓
+```
+
+---
+
+# Eval Report — sales_call_extraction
+**Model:** `gpt-4o-mini`  |  **Transcripts evaluated:** 50
+
+## Layer 2: Extraction Quality
+
+| Field            | P     | R     | F1 `gpt-4o-mini` | F1 `gpt-4.1` | Δ F1    |
+|------------------|-------|-------|------------------|--------------|---------|
+| urgency          | 0.880 | 0.820 | 0.849            | 0.901        | -0.052  |
+| budget_mentioned | 0.940 | 0.910 | 0.925            | 0.948        | -0.023  |
+| objection_type   | 0.710 | 0.680 | 0.695            | 0.801        | -0.106  |
+| sentiment        | 0.900 | 0.880 | 0.889            | 0.912        | -0.023  |
+
+**Overall F1:** 0.839
+
+## Failure Patterns
+
+- hallucination: 7/50 cases (14%)
+- wrong_value: 5/50 cases (10%)
+- missed_null: 2/50 cases (4%)
+
+---
+
+```
+Report saved → results/sales_call_extraction_gpt-4o-mini.md
 ```
 
 ---
