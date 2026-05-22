@@ -1,9 +1,15 @@
 from __future__ import annotations
 
 import json
+import re
 from functools import lru_cache
 
 from anthropic import Anthropic
+
+
+def _parse_json(text: str) -> object:
+    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.MULTILINE)
+    return json.loads(text)
 
 from .schemas import TaskSpec, TestCase, ModelOutput, ExtractionEvalResult
 
@@ -40,7 +46,7 @@ Respond with JSON only:
         max_tokens=1024,
         messages=[{"role": "user", "content": prompt}],
     )
-    return json.loads(response.content[0].text)
+    return _parse_json(response.content[0].text)
 
 
 def evaluate_extraction(
@@ -82,7 +88,7 @@ Respond with JSON only:
         max_tokens=512,
         messages=[{"role": "user", "content": prompt}],
     )
-    result = json.loads(response.content[0].text)
+    result = _parse_json(response.content[0].text)
 
     return ExtractionEvalResult(
         test_case_id=test_case.id,

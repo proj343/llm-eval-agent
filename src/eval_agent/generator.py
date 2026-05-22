@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 import json
+import re
 import uuid
 from pathlib import Path
 
 from anthropic import Anthropic
 
 from .schemas import TaskSpec, TestCase, Transcript, SpeakerTurn
+
+
+def _parse_json(text: str) -> object:
+    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.MULTILINE)
+    return json.loads(text)
 
 _client = Anthropic()
 
@@ -78,7 +84,7 @@ Respond with valid JSON only. Generate exactly {n} items."""
         messages=[{"role": "user", "content": prompt}],
     )
 
-    raw = json.loads(response.content[0].text)
+    raw = _parse_json(response.content[0].text)
     cases = []
     for item in raw:
         turns = [SpeakerTurn(speaker=t["speaker"], text=t["text"]) for t in item["turns"]]

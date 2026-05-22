@@ -6,6 +6,26 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from .schemas import TaskSpec, TestCase, ModelOutput
 
+# Lazily initialised on first use so secrets are loaded before client construction
+_anthropic_client = None
+_openai_client = None
+
+
+def _get_anthropic():
+    global _anthropic_client
+    if _anthropic_client is None:
+        from anthropic import Anthropic
+        _anthropic_client = Anthropic()
+    return _anthropic_client
+
+
+def _get_openai():
+    global _openai_client
+    if _openai_client is None:
+        from openai import OpenAI
+        _openai_client = OpenAI()
+    return _openai_client
+
 
 def run_extraction(
     test_cases: list[TestCase],
@@ -70,9 +90,7 @@ Use null for any field where there is insufficient evidence. Respond with valid 
 
 def _call_model(model: str, prompt: str) -> tuple[str, int]:
     if model.startswith("claude"):
-        from anthropic import Anthropic
-        client = Anthropic()
-        response = client.messages.create(
+        response = _get_anthropic().messages.create(
             model=model,
             max_tokens=512,
             messages=[{"role": "user", "content": prompt}],
@@ -81,9 +99,7 @@ def _call_model(model: str, prompt: str) -> tuple[str, int]:
         tokens = response.usage.input_tokens + response.usage.output_tokens
         return text, tokens
     else:
-        from openai import OpenAI
-        client = OpenAI()
-        response = client.chat.completions.create(
+        response = _get_openai().chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},

@@ -1,0 +1,16 @@
+{
+  "overall_extraction_f1": 0.889,
+  "field_metrics": {
+    "urgency": {
+      "precision": 1.0,
+      "recall": 0.8,
+      "f1": 0.889
+    },
+    "budget_mentioned": {
+      "precision": 1.0,
+      "recall": 0.8,
+      "f1": 0.889
+    }
+  },
+  "n_transcripts": 10
+}

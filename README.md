@@ -71,7 +71,7 @@ src/eval_agent/
 
 ```bash
 # 1. Install
-git clone https://github.com/your-username/llm-eval-agent
+git clone https://github.com/proj343/llm-eval-agent
 cd llm-eval-agent
 make install
 
@@ -217,7 +217,7 @@ make test-regression   # golden fixture regression tests
 make update-golden     # update golden fixtures after intentional changes
 ```
 
-CI runs on every PR. The `eval.yml` workflow can be triggered manually or on release to run a full synthetic eval and post results as a PR comment.
+CI runs on every push and PR (`ci.yml`). The CD pipeline (`cd.yml`) deploys automatically on pushes to `main` that touch `src/`, `Dockerfile`, or `pyproject.toml`.
 
 ---
 

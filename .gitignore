@@ -10,7 +10,9 @@ build/
 .pytest_cache/
 results/*.md
 results/*.json
-tests/fixtures/
+tests/fixtures/*.mp3
+tests/fixtures/*.wav
+tests/fixtures/*.m4a
 *.mp3
 *.wav
 *.m4a

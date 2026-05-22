@@ -1,8 +1,14 @@
 from __future__ import annotations
 
 import json
+import re
 
 from anthropic import Anthropic
+
+
+def _parse_json(text: str) -> object:
+    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.MULTILINE)
+    return json.loads(text)
 
 from .schemas import Transcript, TranscriptEvalResult, TaskSpec
 
@@ -63,7 +69,7 @@ Evaluate the transcript quality on these dimensions and respond with JSON only:
         max_tokens=512,
         messages=[{"role": "user", "content": prompt}],
     )
-    return json.loads(response.content[0].text)
+    return _parse_json(response.content[0].text)
 
 
 def _composite_score(wer: float | None, llm_scores: dict) -> float:

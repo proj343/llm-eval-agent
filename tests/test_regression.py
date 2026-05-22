@@ -144,6 +144,3 @@ def test_markdown_report_contains_required_sections():
     assert "test-model" in md
 
 
-def pytest_addoption(parser):
-    parser.addoption("--update-golden", action="store_true", default=False,
-                     help="Overwrite golden fixture files with current output")
